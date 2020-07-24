@@ -1,4 +1,5 @@
 import axios from "axios"
+let url = 'http://localhost:3001'
 const queryUrl = 'https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=5&'
 const GetVideo = (queryString: string | number): string[] => {
     let allDataArray: any = [];
@@ -28,6 +29,19 @@ const GetVideo = (queryString: string | number): string[] => {
         return allDataArray
 }
 
+const GetSongs = () => {
+    return axios.get(url+'/all')
+}
+const SaveSong = ((songObject: any) => {
+    return axios.post(url+'/song', songObject)
+})
+const DeleteSong = ((id: any) => {
+    return axios.delete(url+`/song/${id}`)
+})
+
 export default {
-    GetVideo:GetVideo
+    GetVideo:GetVideo,
+    GetSongs:GetSongs,
+    SaveSong:SaveSong,
+    DeleteSong:DeleteSong
 }

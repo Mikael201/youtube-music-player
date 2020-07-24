@@ -8,6 +8,13 @@ const App = () => {
   const [songQueue, setSongQueue] = useState<any>([])
   const [isAdmin, setIsAdmin] = useState<boolean>(false)
   const [adminText, setAdminText] = useState<string>('')
+  useEffect(() => {
+    GetVideoService.GetSongs()
+      .then((songs: any) => {
+        console.log(songs.data.data)
+        setSongQueue(songs.data.data)
+      })
+  },[])
   const makeQuery = () => {
     let dataArray = GetVideoService.GetVideo(userInput)
     setTimeout(() => {
@@ -19,14 +26,17 @@ const App = () => {
   }
   const adminChange = (event:any) => {
     setAdminText(event.target.value)
-    if(adminText === 'YOUSHOULDNEVERDOITLIKETHIS') { // this is done like this because we dont have any login on the page + on parties no-one has computers so they cant see the source code from for i.e. developer tools that easy. However it's crucial that the users who are on phone cant see the Youtube media player. This should be visible only for the main music playing device for i.e. the computer
+    if(adminText === 'YOUSHOULDNEVERDOITLIKETHIS') { // this is done like this because we dont have any login on the page (how to be admin) + on parties no-one has computers so they cant see the source code from for i.e. developer tools that easy. However it's crucial that the users who are on phone cant see the Youtube media player. This should be visible only for the main music playing device for i.e. the computer.
       setIsAdmin(true)
     }
   }
   const putToQueue = (queryObject:any): any => {
-    setSongQueue(songQueue.concat(queryObject))
-    setUserInput('')
-    setQueryResults([])
+    GetVideoService.SaveSong(queryObject)
+      .then((object:any) => {
+        setSongQueue((prev:any) => [...prev, object])
+        setUserInput('')
+        setQueryResults([])
+      }).catch(e => console.log(e))
   }
   const takeNextSong = () => {
     console.log("isPlayed: " + isPlayed)
@@ -47,7 +57,10 @@ const App = () => {
 const startVideo = (event:any) => {
   console.log("onReady")
   event.target.playVideo();
-  setSongQueue(songQueue.filter((obj:any) => obj.videoid !== isPlayed))
+  GetVideoService.DeleteSong(isPlayed)
+    .then(() => {
+      setSongQueue(songQueue.filter((obj:any) => obj.videoid !== isPlayed))
+    })
 }
   return(
     <div>
