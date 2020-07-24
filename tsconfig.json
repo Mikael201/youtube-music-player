@@ -1,6 +1,6 @@
 {
   "include": [
-    "src/*"
+    "src/*", "../server.js"
   ],
   "compilerOptions": {
     "target": "es5",
