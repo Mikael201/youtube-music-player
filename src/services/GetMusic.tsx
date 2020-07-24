@@ -1,34 +1,30 @@
 import axios from "axios"
-const queryUrl = 'https://www.googleapis.com/youtube/v3/search?'
-const videoUrl = 'https://www.googleapis.com/youtube/v3/videos?part=snippet&'
-//'https://www.googleapis.com/youtube/v3/search?q=pynnonen&key=AIzaSyCa0SSIFUFgQ3jdm4u2grfkOxFCLpeRP30'
+const queryUrl = 'https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=5&'
 const GetVideo = (queryString: string | number): string[] => {
-    let videoTitles: string[] = [];
     let allDataArray: any = [];
-    axios.get(queryUrl + `q=${queryString}&key=AIzaSyCvyVY7J2AAfWJ1L2bFb9cZjyE57qVHTjU`) //saadaan videoIdt
+    let allVIds: any;
+    axios.get(queryUrl + `q=${queryString}&fields=items(snippet(title))&key=AIzaSyCaC2R1ppFIJcxG3qjJ5IeGkEuG_Z-TwK4`) //saadaan videoIdt
         .then((allItems: any) => {
             let allTitles = allItems.data.items.map((itemsObject:any) => {
-                return itemsObject.id.videoId;
+                return itemsObject.snippet.title;
             })
-            let newAllTitles = allTitles.filter((f:any) => f) //remove undefines
-            newAllTitles.map((videoid:string|number) => {
-                if(videoid !== undefined) {
-                    axios.get(videoUrl + `id=${videoid}&key=AIzaSyCvyVY7J2AAfWJ1L2bFb9cZjyE57qVHTjU`)
-                    .then(videodata => {
-                        videodata.data.items.map((videoSpecificData: any) => {
-                            videoTitles.push(videoSpecificData.snippet.title)
-                        })
-                    }).catch(e => console.log(e))
-                }
-            })
-            for(let i = 0; i<newAllTitles.length; i++) {
-                allDataArray[i] = {
-                    videoid: videoTitles[i],
-                    title: newAllTitles[i]
-                }
-            }
+            let newAllTitles = allTitles.filter((f:any) => f) //remove possible undefineds
+            console.log("newAllTitles: " + newAllTitles)
+            axios.get(queryUrl + `q=${queryString}&fields=items(id(videoId))&key=AIzaSyCaC2R1ppFIJcxG3qjJ5IeGkEuG_Z-TwK4`)
+                .then((allvideoids: any) => {
+                    allVIds = allvideoids.data.items.map((itemsObject: any) => {
+                        return itemsObject.id.videoId
+                    })
+                    console.log("newAllVideoIds: " + allVIds)
+                    for(let i = 0; i<newAllTitles.length; i++) {
+                        console.log(allVIds[Object.keys(allVIds)[i]])
+                        allDataArray[i] = {
+                            videoid: allVIds[Object.keys(allVIds)[i]],
+                            title: newAllTitles[i]
+                        }
+                    }
+                }).catch(e => console.log(e))
         }).catch(e => console.log(e))
-        console.log(allDataArray)
         return allDataArray
 }
 

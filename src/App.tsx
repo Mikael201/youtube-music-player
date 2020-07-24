@@ -2,21 +2,26 @@ import React, {useState, useEffect} from 'react';
 import GetVideoService from './services/GetMusic'
 import YouTube from 'react-youtube';
 const App = () => {
-  const [isPlayed, setIsPlayed] = useState('pFzL_8c494M')
-  const [autoplay, setAutoplay] = useState('?autoplay=1&mute=1&enablejsapi=1')
-  const [userInput, setUserInput] = useState('')
+  const [isPlayed, setIsPlayed] = useState<string>('1jILZu-5xJg')
+  const [userInput, setUserInput] = useState<string>('')
   const [queryResults, setQueryResults] = useState<string[]>([])
   const [songQueue, setSongQueue] = useState<any>([])
-  useEffect(() => {
-    setQueryResults(queryResults)
-  },[queryResults])
+  const [isAdmin, setIsAdmin] = useState<boolean>(false)
+  const [adminText, setAdminText] = useState<string>('')
   const makeQuery = () => {
-    let titlesAndVideoIDs:string[] = GetVideoService.GetVideo(userInput);
-    setQueryResults(titlesAndVideoIDs)
-    console.log(queryResults)
+    let dataArray = GetVideoService.GetVideo(userInput)
+    setTimeout(() => {
+      setQueryResults(dataArray)
+    },4000)
   }
   const change = (event:any) => {
     setUserInput(event.target.value)
+  }
+  const adminChange = (event:any) => {
+    setAdminText(event.target.value)
+    if(adminText === 'YOUSHOULDNEVERDOITLIKETHIS') { // this is done like this because we dont have any login on the page + on parties no-one has computers so they cant see the source code from for i.e. developer tools that easy. However it's crucial that the users who are on phone cant see the Youtube media player. This should be visible only for the main music playing device for i.e. the computer
+      setIsAdmin(true)
+    }
   }
   const putToQueue = (queryObject:any): any => {
     setSongQueue(songQueue.concat(queryObject))
@@ -24,37 +29,42 @@ const App = () => {
     setQueryResults([])
   }
   const takeNextSong = () => {
-    setSongQueue(songQueue.filter((obj:any) => obj.videoid !== isPlayed))
+    console.log("isPlayed: " + isPlayed)
     setIsPlayed(songQueue[0].videoid)
   }
   const showQueue = () =>
-  songQueue.map((song:any) => {
-    return(
-      <div>
+  songQueue.map((song:any) => 
+      <div key={song.videoid}>
         <h5>{song.title}</h5>
       </div>
-    )
-  })
+)
   const getQueryResults = () => 
-    queryResults.map((query:any) => {
-    return(
-      <div>
-        <h5>{query.title}</h5><button onClick={putToQueue(query)}>JONOON</button>
+    queryResults.map((query:any) => 
+      <div key={query.videoid} style={{borderStyle: 'solid'}}>
+        <h5>{query.title}</h5><button onClick={() => putToQueue(query)}>JONOON</button> <br />
       </div>
-    )
-    }
-  )
+)
+const startVideo = (event:any) => {
+  console.log("onReady")
+  event.target.playVideo();
+  setSongQueue(songQueue.filter((obj:any) => obj.videoid !== isPlayed))
+}
   return(
     <div>
+      {isAdmin ? 
         <YouTube
           onEnd={takeNextSong}
-          videoId={isPlayed+autoplay}
-        />
-        <input type = "text" value={userInput} name="userInput" onChange={change}></input> <button onClick = {makeQuery}>Etsi</button><br />
+          videoId={isPlayed}
+          onReady={startVideo}
+          onStateChange={startVideo}
+        /> : null}
+
+        <input type = "text" placeholder="biisin nimi / esittäjä tmv" value={userInput} name="userInput" onChange={change}></input> <button onClick = {makeQuery}>Etsi</button><br />
         Ehdotukset biisillesi: <br />
         {getQueryResults()} <br /> <br />
         Biisijono: <br />
         {showQueue()}
+        <input type = "text" value={adminText} name="adminText" onChange={adminChange}></input>
     </div>
   )
 }
