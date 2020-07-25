@@ -1,17 +1,16 @@
 import axios from "axios"
-let url = 'http://localhost:3001'
 const queryUrl = 'https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=5&'
 const GetVideo = (queryString: string | number): string[] => {
     let allDataArray: any = [];
     let allVIds: any;
-    axios.get(queryUrl + `q=${queryString}&fields=items(snippet(title))&key=AIzaSyCaC2R1ppFIJcxG3qjJ5IeGkEuG_Z-TwK4`) //saadaan videoIdt
+    axios.get(queryUrl + `q=${queryString}&fields=items(snippet(title))&key=API_KEY`) //saadaan videoIdt
         .then((allItems: any) => {
             let allTitles = allItems.data.items.map((itemsObject:any) => {
                 return itemsObject.snippet.title;
             })
             let newAllTitles = allTitles.filter((f:any) => f) //remove possible undefineds
             console.log("newAllTitles: " + newAllTitles)
-            axios.get(queryUrl + `q=${queryString}&fields=items(id(videoId))&key=AIzaSyCaC2R1ppFIJcxG3qjJ5IeGkEuG_Z-TwK4`)
+            axios.get(queryUrl + `q=${queryString}&fields=items(id(videoId))&key=API_KEY`)
                 .then((allvideoids: any) => {
                     allVIds = allvideoids.data.items.map((itemsObject: any) => {
                         return itemsObject.id.videoId
@@ -30,13 +29,13 @@ const GetVideo = (queryString: string | number): string[] => {
 }
 
 const GetSongs = () => {
-    return axios.get(url+'/all')
+    return axios.get('/all')
 }
 const SaveSong = ((songObject: any) => {
-    return axios.post(url+'/song', songObject)
+    return axios.post('/song', songObject)
 })
 const DeleteSong = ((id: any) => {
-    return axios.delete(url+`/song/${id}`)
+    return axios.delete(`/song/${id}`)
 })
 
 export default {

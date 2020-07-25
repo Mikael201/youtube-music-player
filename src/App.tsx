@@ -2,12 +2,13 @@ import React, {useState, useEffect} from 'react';
 import GetVideoService from './services/GetMusic'
 import YouTube from 'react-youtube';
 const App = () => {
-  const [isPlayed, setIsPlayed] = useState<string>('1jILZu-5xJg')
+  const [isPlayed, setIsPlayed] = useState<string>('')
   const [userInput, setUserInput] = useState<string>('')
   const [queryResults, setQueryResults] = useState<string[]>([])
   const [songQueue, setSongQueue] = useState<any>([])
   const [isAdmin, setIsAdmin] = useState<boolean>(false)
   const [adminText, setAdminText] = useState<string>('')
+  const [now, setNow] = useState<string>('')
   useEffect(() => {
     GetVideoService.GetSongs()
       .then((songs: any) => {
@@ -33,18 +34,28 @@ const App = () => {
   const putToQueue = (queryObject:any): any => {
     GetVideoService.SaveSong(queryObject)
       .then((object:any) => {
-        setSongQueue((prev:any) => [...prev, object])
+        setSongQueue(songQueue.concat(object))
         setUserInput('')
         setQueryResults([])
+        GetVideoService.GetSongs()
+          .then((songs: any) => {
+            console.log(songs.data.data)
+            setSongQueue(songs.data.data)
+      })
       }).catch(e => console.log(e))
   }
-  const takeNextSong = () => {
-    console.log("isPlayed: " + isPlayed)
-    setIsPlayed(songQueue[0].videoid)
+  const takeNextSong = (event:any) => {
+    console.log("onEnd triggered")
+    GetVideoService.GetSongs()
+    .then((songs: any) => {
+      console.log(songs.data.data)
+      setSongQueue(songs.data.data)
+    })
+      event.target.playVideo()
   }
   const showQueue = () =>
-  songQueue.map((song:any) => 
-      <div key={song.videoid}>
+  songQueue.map((song:any) =>  
+      <div key={song.videoid} style={{borderStyle: '5px solid red'}}>
         <h5>{song.title}</h5>
       </div>
 )
@@ -54,30 +65,31 @@ const App = () => {
         <h5>{query.title}</h5><button onClick={() => putToQueue(query)}>JONOON</button> <br />
       </div>
 )
-const startVideo = (event:any) => {
-  console.log("onReady")
-  event.target.playVideo();
+const play = (event:any) => {
   GetVideoService.DeleteSong(isPlayed)
-    .then(() => {
-      setSongQueue(songQueue.filter((obj:any) => obj.videoid !== isPlayed))
-    })
+  .then(() => {
+    console.log("tuleeko takeNextSongDeleteSong")
+    setNow(songQueue[0].title)
+    setSongQueue(songQueue.filter((obj:any) => obj.videoid !== isPlayed))
+    setIsPlayed(songQueue[0].videoid)
+  })
 }
   return(
     <div>
       {isAdmin ? 
+      <div>
+        <button onClick={() => setIsPlayed(songQueue[0].videoid)}>aloita</button>
         <YouTube
-          onEnd={takeNextSong}
+          onPlay={play}
+          onStateChange={takeNextSong}
           videoId={isPlayed}
-          onReady={startVideo}
-          onStateChange={startVideo}
-        /> : null}
-
+        /></div> : null}
+        {now === '' ? <h3>Tässä pitäis lukee tänhetkinen biisi... toisaalta, se biisi päivittyy tähän vuoon biisien väleissä</h3> : <h2>Nyt soi: {now}</h2>}
         <input type = "text" placeholder="biisin nimi / esittäjä tmv" value={userInput} name="userInput" onChange={change}></input> <button onClick = {makeQuery}>Etsi</button><br />
-        Ehdotukset biisillesi: <br />
         {getQueryResults()} <br /> <br />
         Biisijono: <br />
-        {showQueue()}
-        <input type = "text" value={adminText} name="adminText" onChange={adminChange}></input>
+        {showQueue()} <br /> <br /> <br />
+        <input type = "text" placeholder="tube playerin käyttöönotto" value={adminText} name="adminText" onChange={adminChange}></input>
     </div>
   )
 }
