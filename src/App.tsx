@@ -9,6 +9,7 @@ const App = () => {
   const [isAdmin, setIsAdmin] = useState<boolean>(false)
   const [adminText, setAdminText] = useState<string>('')
   const [now, setNow] = useState<string>('')
+  const [disable, setDisable] = useState<boolean>(false)
   useEffect(() => {
     GetVideoService.GetSongs()
       .then((songs: any) => {
@@ -17,6 +18,7 @@ const App = () => {
       })
   },[])
   const makeQuery = () => {
+    setDisable(false)
     let dataArray = GetVideoService.GetVideo(userInput)
     setTimeout(() => {
       setQueryResults(dataArray)
@@ -31,7 +33,8 @@ const App = () => {
       setIsAdmin(true)
     }
   }
-  const putToQueue = (queryObject:any): any => {
+  const putToQueue = (queryObject:object): any => {
+    setDisable(true)
     GetVideoService.SaveSong(queryObject)
       .then((object:any) => {
         setSongQueue(songQueue.concat(object))
@@ -62,7 +65,7 @@ const App = () => {
   const getQueryResults = () => 
     queryResults.map((query:any) => 
       <div key={query.videoid} style={{borderStyle: 'solid'}}>
-        <h5>{query.title}</h5><button onClick={() => putToQueue(query)}>JONOON</button> <br />
+        <h5>{query.title}</h5><button disabled={disable} onClick={() => putToQueue(query)}>JONOON</button> <br />
       </div>
 )
 const play = (event:any) => {
@@ -84,7 +87,6 @@ const play = (event:any) => {
           onStateChange={takeNextSong}
           videoId={isPlayed}
         /></div> : null}
-        {now === '' ? <h3>Tässä pitäis lukee tänhetkinen biisi... toisaalta, se biisi päivittyy tähän vuoon biisien väleissä</h3> : <h2>Nyt soi: {now}</h2>}
         <input type = "text" placeholder="biisin nimi / esittäjä tmv" value={userInput} name="userInput" onChange={change}></input> <button onClick = {makeQuery}>Etsi</button><br />
         {getQueryResults()} <br /> <br />
         Biisijono: <br />
