@@ -3,21 +3,18 @@ const queryUrl = 'https://www.googleapis.com/youtube/v3/search?part=snippet&maxR
 const GetVideo = (queryString: string | number): string[] => {
     let allDataArray: any = [];
     let allVIds: any;
-    axios.get(queryUrl + `q=${queryString}&fields=items(snippet(title))&key=API_KEY`) //saadaan videoIdt
+    axios.get(queryUrl + `q=${queryString}&fields=items(snippet(title))&key=API_KEY`) //GET all video titles
         .then((allItems: any) => {
-            let allTitles = allItems.data.items.map((itemsObject:any) => {
-                return itemsObject.snippet.title;
+            let allTitles: string[] = allItems.data.items.map((itemsObject:any) => {
+                return itemsObject.snippet.title; //return all video titles to allTitles
             })
             let newAllTitles = allTitles.filter((f:any) => f) //remove possible undefineds
-            console.log("newAllTitles: " + newAllTitles)
-            axios.get(queryUrl + `q=${queryString}&fields=items(id(videoId))&key=API_KEY`)
+            axios.get(queryUrl + `q=${queryString}&fields=items(id(videoId))&key=API_KEY`) //GET all videoIDs
                 .then((allvideoids: any) => {
                     allVIds = allvideoids.data.items.map((itemsObject: any) => {
-                        return itemsObject.id.videoId
+                        return itemsObject.id.videoId //return all videoIDs to allVIds
                     })
-                    console.log("newAllVideoIds: " + allVIds)
                     for(let i = 0; i<newAllTitles.length; i++) {
-                        console.log(allVIds[Object.keys(allVIds)[i]])
                         allDataArray[i] = {
                             videoid: allVIds[Object.keys(allVIds)[i]],
                             title: newAllTitles[i]
@@ -31,11 +28,11 @@ const GetVideo = (queryString: string | number): string[] => {
 const GetSongs = () => {
     return axios.get('/all')
 }
-const SaveSong = ((songObject: any) => {
+const SaveSong = ((songObject: object) => {
     return axios.post('/song', songObject)
 })
-const DeleteSong = ((id: any) => {
-    return axios.delete(`/song/${id}`)
+const DeleteSong = ((id: string) => {
+    return axios.delete(`/song/${id}`) //for debugging locally the url should be service/song/${id} for i.e. http://localhost:3001/song/${id}
 })
 
 export default {

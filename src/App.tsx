@@ -13,7 +13,6 @@ const App = () => {
   useEffect(() => {
     GetVideoService.GetSongs()
       .then((songs: any) => {
-        console.log(songs.data.data)
         setSongQueue(songs.data.data)
       })
   },[])
@@ -36,34 +35,31 @@ const App = () => {
   const putToQueue = (queryObject:object): any => {
     setDisable(true)
     GetVideoService.SaveSong(queryObject)
-      .then((object:any) => {
+      .then((object:object) => {
         setSongQueue(songQueue.concat(object))
         setUserInput('')
         setQueryResults([])
         GetVideoService.GetSongs()
           .then((songs: any) => {
-            console.log(songs.data.data)
             setSongQueue(songs.data.data)
       })
       }).catch(e => console.log(e))
   }
   const takeNextSong = (event:any) => {
-    console.log("onEnd triggered")
     GetVideoService.GetSongs()
     .then((songs: any) => {
-      console.log(songs.data.data)
       setSongQueue(songs.data.data)
     })
       event.target.playVideo()
   }
   const showQueue = () =>
-  songQueue.map((song:any) =>  
+  songQueue.map((song: any) =>  
       <div key={song.videoid} style={{borderStyle: '5px solid red'}}>
-        <h5>{song.title}</h5>
+        <h5>{song.title} <hr /></h5>
       </div>
 )
   const getQueryResults = () => 
-    queryResults.map((query:any) => 
+    queryResults.map((query: any) => 
       <div key={query.videoid} style={{borderStyle: 'solid'}}>
         <h5>{query.title}</h5><button disabled={disable} onClick={() => putToQueue(query)}>JONOON</button> <br />
       </div>
@@ -71,7 +67,6 @@ const App = () => {
 const play = (event:any) => {
   GetVideoService.DeleteSong(isPlayed)
   .then(() => {
-    console.log("tuleeko takeNextSongDeleteSong")
     setNow(songQueue[0].title)
     setSongQueue(songQueue.filter((obj:any) => obj.videoid !== isPlayed))
     setIsPlayed(songQueue[0].videoid)
@@ -89,7 +84,7 @@ const play = (event:any) => {
         /></div> : null}
         <input type = "text" placeholder="biisin nimi / esittäjä tmv" value={userInput} name="userInput" onChange={change}></input> <button onClick = {makeQuery}>Etsi</button><br />
         {getQueryResults()} <br /> <br />
-        Biisijono: <br />
+        <h1>Biisijono:</h1> <br />
         {showQueue()} <br /> <br /> <br />
         <input type = "text" placeholder="tube playerin käyttöönotto" value={adminText} name="adminText" onChange={adminChange}></input>
     </div>

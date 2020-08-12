@@ -7,8 +7,9 @@ Youtube music player for parties.
 
 Instructions:
 
-Get your Free API_KEY from Youtube API and insert it to where it says "API_KEY". Host this in some service for i.e. Heroku, tell everyone on the party the URL --> everyone can go and put their music to the queue.
+1. Get your Free API_KEY from Youtube API and insert it to where it says "API_KEY"
+2. Make a production build from this project "npm run build"
+3. "build" folder should appear in the root
+4. Continue instructions from "youtube-musicplayer-backend" repository's README.md
 
-Stack:
-
-React, TypeScript & Youtube API
+Stack: React, TypeScript & Youtube API
