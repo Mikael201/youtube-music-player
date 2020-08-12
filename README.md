@@ -1,4 +1,4 @@
-**Better instructions on how to use this on the -backend repository**
+
 
 Description:
 
@@ -14,10 +14,6 @@ Instructions:
 3. "build" folder should appear in the root
 4. Continue instructions from "youtube-musicplayer-backend" repository's README.md
 
-<<<<<<< HEAD
-Stack: React, TypeScript & Youtube API
-=======
 Stack:
 
 React, TypeScript & Youtube API
->>>>>>> 16024f809e817f2c80c33d1d53af635f6e3d4649
